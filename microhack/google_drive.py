@@ -40,7 +40,14 @@ class GoogleDriveConnector:
                     )
                 
                 flow = InstalledAppFlow.from_client_secrets_file(self.credentials_file, SCOPES)
-                creds = flow.run_local_server(port=0)
+                
+                # Try to run with browser, fall back to manual flow if that fails
+                try:
+                    creds = flow.run_local_server(port=0)
+                except Exception as e:
+                    print(f"Browser authentication failed: {e}")
+                    print("Using manual authentication flow...")
+                    creds = self._manual_auth_flow(flow)
             
             # Save the credentials for the next run
             os.makedirs(os.path.dirname(self.token_file), exist_ok=True)
@@ -48,6 +55,44 @@ class GoogleDriveConnector:
                 token.write(creds.to_json())
         
         self.service = build('drive', 'v3', credentials=creds)
+    
+    def _manual_auth_flow(self, flow):
+        """Manual authentication flow for environments without browser."""
+        auth_url, _ = flow.authorization_url(prompt='consent')
+        
+        print("=" * 60)
+        print("🔐 Manual Google Drive Authentication")
+        print("=" * 60)
+        print("1. Copy and paste this URL into your browser:")
+        print(f"   {auth_url}")
+        print("\n2. Sign in with your Google account")
+        print("3. Grant the requested permissions")
+        print("4. You'll be redirected to a page that may show an error")
+        print("5. Look for the 'code=' parameter in the URL")
+        print("6. Copy everything after 'code=' and before '&' (if present)")
+        print("7. Paste it here when prompted")
+        print("\n💡 Tip: If you see a loading loop or error page, check the URL bar")
+        print("   The authorization code is in the URL parameters")
+        print("=" * 60)
+        
+        # Get authorization code from user
+        auth_code = input("Enter the authorization code: ").strip()
+        
+        # Clean the code (remove any extra parameters)
+        if '&' in auth_code:
+            auth_code = auth_code.split('&')[0]
+        
+        try:
+            # Exchange authorization code for credentials
+            flow.fetch_token(code=auth_code)
+            return flow.credentials
+        except Exception as e:
+            print(f"❌ Error exchanging code for token: {e}")
+            print("This might be because:")
+            print("1. The code was copied incorrectly")
+            print("2. The code has expired (try again)")
+            print("3. The OAuth app isn't properly configured")
+            raise
     
     def list_files(self, query: str = None) -> List[Dict[str, Any]]:
         """List files in Google Drive."""

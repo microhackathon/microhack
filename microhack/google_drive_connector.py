@@ -3,6 +3,7 @@ import pandas as pd
 from typing import Dict, Any, Optional
 import pathway as pw
 from microhack.google_drive import GoogleDriveConnector, GoogleDriveStream
+import os
 
 class GoogleDrivePathwayConnector(pw.io.python.ConnectorSubject):
     """Pathway connector for Google Drive data streaming."""
@@ -14,7 +15,24 @@ class GoogleDrivePathwayConnector(pw.io.python.ConnectorSubject):
                  refresh_interval: int = 60,
                  value_column: str = "value"):
         super().__init__()
-        self.drive_connector = GoogleDriveConnector(credentials_file)
+        
+        # Check if token exists first
+        token_file = "config/token.json"
+        if not os.path.exists(token_file):
+            raise FileNotFoundError(
+                f"Authentication token not found: {token_file}\n"
+                "Please run './setup_auth.py' first to authenticate with Google Drive."
+            )
+        
+        try:
+            self.drive_connector = GoogleDriveConnector(credentials_file)
+        except Exception as e:
+            print(f"Error initializing Google Drive connector: {e}")
+            print("Please ensure you have:")
+            print("1. credentials.json in config/ directory")
+            print("2. Run './setup_auth.py' to authenticate")
+            raise
+        
         self.file_id = file_id
         self.filename = filename
         self.refresh_interval = refresh_interval

@@ -45,15 +45,24 @@ docker compose -f api.yml up
 
 ### 3. Google Drive Integration
 ```bash
-# Run setup script (choose one):
+# Step 1: Run setup script (choose one):
 ./setup.sh                    # Shell script (recommended)
 ./setup_google_drive.py       # Direct Python script
 python3 setup_google_drive.py # Explicit python3 command
 
-# Build Google Drive containers
-docker compose -f google_drive.yml build
+# Step 2: Set up Google Cloud credentials (follow setup instructions)
+# - Create Google Cloud project
+# - Enable Google Drive API
+# - Download credentials.json to config/ directory
 
-# Start Google Drive integration
+# Step 3: Authenticate with Google Drive (outside Docker):
+./setup_auth.py               # This handles OAuth authentication
+
+# Step 4: Upload sample data to Google Drive:
+./upload_to_drive.py          # Uploads sample_data.csv to Google Drive
+
+# Step 5: Build and run Google Drive containers:
+docker compose -f google_drive.yml build
 docker compose -f google_drive.yml up
 ```
 
@@ -324,6 +333,48 @@ docker compose -f api.yml logs api_server
 # View Google Drive logs
 docker compose -f google_drive.yml logs pathway_app
 ```
+
+## 🛠️ Troubleshooting
+
+### Google Drive Authentication Issues
+
+**Error: "could not locate runnable browser"**
+- This happens when running OAuth in Docker containers
+- **Solution**: Run authentication outside Docker first:
+  ```bash
+  ./setup_auth.py  # Run this on your host machine
+  ```
+
+**Error: "Authentication token not found"**
+- The OAuth token hasn't been created yet
+- **Solution**: Run the authentication setup:
+  ```bash
+  ./setup_auth.py
+  ```
+
+**Error: "Credentials file not found"**
+- The `credentials.json` file is missing
+- **Solution**: Download from Google Cloud Console and place in `config/` directory
+
+**Error: "File not found in Google Drive"**
+- The specified file doesn't exist in your Google Drive
+- **Solution**: Upload the file first:
+  ```bash
+  ./upload_to_drive.py
+  ```
+
+### General Issues
+
+**Docker build fails**
+- Check that all requirements are installed
+- Try rebuilding: `docker compose -f google_drive.yml build --no-cache`
+
+**Permission denied errors**
+- Make sure files are executable: `chmod +x *.py *.sh`
+
+**Port conflicts**
+- Change ports in the Docker Compose files if needed
+- Check if port 8000 is already in use
 
 ## 🚀 Deployment
 
