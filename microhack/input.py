@@ -39,3 +39,12 @@ def input():
             format=format,
             autocommit_duration_ms=get_settings().autocommit_duration_ms,
         )
+    elif get_settings().input_connector == "google_drive":
+        from microhack.google_drive_connector import google_drive_input
+        
+        return google_drive_input(
+            filename=get_settings().google_drive_filename,
+            credentials_file=get_settings().google_drive_credentials_file,
+            refresh_interval=get_settings().google_drive_refresh_interval,
+            value_column=get_settings().google_drive_value_column
+        )

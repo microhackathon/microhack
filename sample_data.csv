@@ -1,0 +1,11 @@
+value,timestamp,category,description
+10,2024-01-01 10:00:00,A,First entry
+25,2024-01-01 10:01:00,B,Second entry
+15,2024-01-01 10:02:00,A,Third entry
+30,2024-01-01 10:03:00,C,Fourth entry
+20,2024-01-01 10:04:00,B,Fifth entry
+35,2024-01-01 10:05:00,A,Sixth entry
+12,2024-01-01 10:06:00,C,Seventh entry
+28,2024-01-01 10:07:00,B,Eighth entry
+18,2024-01-01 10:08:00,A,Ninth entry
+40,2024-01-01 10:09:00,C,Tenth entry 

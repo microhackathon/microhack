@@ -8,7 +8,7 @@ ENV_FILE_PATH = "config/.env"
 
 
 class Settings(BaseSettings):
-    input_connector: Literal["python", "kafka"]
+    input_connector: Literal["python", "kafka", "google_drive"]
     autocommit_duration_ms: int
     pathway_threads: int
 
@@ -16,6 +16,12 @@ class Settings(BaseSettings):
     kafka_group_id: str
     kafka_session_timeout_ms: str
     kafka_topic: str
+
+    # Google Drive settings
+    google_drive_filename: str = ""
+    google_drive_credentials_file: str = "config/credentials.json"
+    google_drive_refresh_interval: int = 60
+    google_drive_value_column: str = "value"
 
     class Config:
         case_sensitive = False

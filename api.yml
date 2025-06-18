@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  api_server:
+    build:
+      context: .
+      args:
+        BUILD_ENVIRONMENT: dev
+    ports:
+      - "8000:8000"
+    environment:
+      INPUT_CONNECTOR: python
+      PATHWAY_THREADS: 1
+    volumes:
+      - .:/microhack
+    command: ["python", "run_api.py"] 

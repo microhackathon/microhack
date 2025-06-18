@@ -1,0 +1,19 @@
+version: '3'
+
+services:
+  pathway_app:
+    build:
+      context: .
+      args:
+        BUILD_ENVIRONMENT: dev
+    environment:
+      INPUT_CONNECTOR: google_drive
+      PATHWAY_THREADS: 1
+      GOOGLE_DRIVE_FILENAME: sample_data.csv
+      GOOGLE_DRIVE_REFRESH_INTERVAL: 30
+      GOOGLE_DRIVE_VALUE_COLUMN: value
+    volumes:
+      - .:/microhack
+      - ./config:/microhack/config
+    ports:
+      - "8000:8000" 
